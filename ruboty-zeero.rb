@@ -11,5 +11,17 @@ module Ruboty
         message.reply("Hello world!")
       end
     end
+
+    class Echo < Base
+      on(
+        /echo (.*)/i,
+        name: "echo",
+        description: "Echo your message."
+      )
+
+      def echo(message)
+        message.reply("#{message[1]}")
+      end
+    end
   end
 end
