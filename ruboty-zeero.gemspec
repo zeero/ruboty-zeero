@@ -10,7 +10,10 @@ Gem::Specification.new do |s|
   s.authors = ["zeero"]
   s.date = "2016-12-17"
   s.email = ["zeero26@gmail.com"]
-  s.files = ["ruboty-zeero.rb"]
+  s.files = [
+    "ruboty-zeero.rb",
+    "ruboty-zeero-cron.rb",
+  ]
   s.rubygems_version = "2.5.1"
   s.summary = "My Ruboty."
 end
