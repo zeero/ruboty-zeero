@@ -1,6 +1,6 @@
 module Ruboty
   module Handlers
-    class HelloWorld < Base
+    class Test < Base
       on(
         /test/i,
         name: "test",

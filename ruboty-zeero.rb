@@ -1,3 +1,5 @@
+require 'ruboty-zeero-cron'
+
 module Ruboty
   module Handlers
     require 'yaml'
