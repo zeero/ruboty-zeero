@@ -1,5 +1,3 @@
-require 'ruboty-zeero-cron'
-
 module Ruboty
   module Handlers
     require 'yaml'
@@ -29,7 +27,7 @@ module Ruboty
     end
 
     class Color < Base
-      @@colors = YAML.load_file(File.expand_path('../resources/colors.yaml', __FILE__))
+      @@colors = YAML.load_file(File.expand_path('../../../../resources/colors.yaml', __FILE__))
 
       on(
         /color ([a-z]+)/,

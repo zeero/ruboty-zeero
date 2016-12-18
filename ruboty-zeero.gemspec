@@ -1,16 +1,27 @@
-# -*- encoding: utf-8 -*-
-# stub: ruboty-zeero 0.0.1 ruby .
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'ruboty/zeero/version'
 
-Gem::Specification.new do |s|
-  s.name = "ruboty-zeero"
-  s.version = "0.0.1"
+Gem::Specification.new do |spec|
+  spec.name          = "ruboty-zeero"
+  spec.version       = Ruboty::Zeero::VERSION
+  spec.authors       = ["zeero"]
+  spec.email         = ["zeero26@gmail.com"]
+  spec.date          = "2016-12-17"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.require_paths = ["."]
-  s.authors = ["zeero"]
-  s.date = "2016-12-17"
-  s.email = ["zeero26@gmail.com"]
-  s.files = `git ls-files -z`.split("\x0")
-  s.rubygems_version = "2.5.1"
-  s.summary = "My Ruboty."
+  spec.summary       = %q{My Ruboty.}
+  spec.homepage      = "https://github.com/zeero/ruboty-zeero"
+  spec.license       = "MIT"
+
+  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
+    f.match(%r{^(test|spec|features)/})
+  end
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = ["lib"]
+
+  spec.add_development_dependency "bundler", "~> 1.13"
+  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "minitest", "~> 5.0"
 end
