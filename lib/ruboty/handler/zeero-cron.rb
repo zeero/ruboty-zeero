@@ -5,11 +5,17 @@ module Ruboty
     class CronP2Q < Base
       def initialize(robot)
         super
-        Chrono::Trigger.new("10 * * * *") {
-          robot.say({
-            body: "ChronoTrigger!",
-          })
-        }.run
+        @thread = Thread.new {
+          attributes = {
+            from: "log@conference.zeero.xmpp.slack.com/zeero",
+            type: "groupchat",
+            body: "ruboty echo Trigger!",
+          }
+          Chrono::Trigger.new("37 * * * *") {
+            puts "Chrono!"
+            robot.receive(attributes)
+          }.run
+        }
       end
     end
   end
