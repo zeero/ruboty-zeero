@@ -6,14 +6,15 @@ module Ruboty
       def initialize(robot)
         super
         @thread = Thread.new {
+          msg = Message.new(robot: robot)
           attributes = {
-            from: "log@conference.zeero.xmpp.slack.com/zeero",
+            to: "log@conference.zeero.xmpp.slack.com/zeero",
             type: "groupchat",
-            body: "ruboty echo Trigger!",
+            body: "ChronoTrigger!",
+            original: msg.original
           }
-          Chrono::Trigger.new("37 * * * *") {
-            puts "Chrono!"
-            robot.receive(attributes)
+          Chrono::Trigger.new("10 0 * * *") {
+            robot.say(attributes)
           }.run
         }
       end
