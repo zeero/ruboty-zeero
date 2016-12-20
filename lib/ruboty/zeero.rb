@@ -6,4 +6,4 @@ module Ruboty
 end
 
 require 'ruboty/handler/zeero'
-require 'ruboty/handler/zeero-cron'
+require 'ruboty/handler/cron'
