@@ -1,18 +1,20 @@
 require 'test_helper'
 
-class Ruboty::ZeeroTest < Minitest::Test
-  def setup
+describe Ruboty::Zeero do
+  before do
     @robot = MockRobot.new
     @message = MockMessage.new
   end
 
-  def test_that_it_has_a_version_number
+  it "バージョン番号をもつ" do
     refute_nil ::Ruboty::Zeero::VERSION
   end
 
-  def test_it_does_something_useful
-    hello = Ruboty::Handlers::HelloWorld.new(@robot)
-    assert_equal hello.hello(@message), "Hello world!"
+  describe "HelloWorld" do
+    it "Hello world!を返す" do
+      hello = Ruboty::Handlers::HelloWorld.new(@robot)
+      assert_equal hello.hello(@message), "Hello world!"
+    end
   end
 end
 
