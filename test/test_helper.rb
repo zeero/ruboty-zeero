@@ -1,4 +1,14 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'minitest/autorun'
+
+require 'ruboty'
+
 require 'ruboty/zeero'
 
-require 'minitest/autorun'
+class MockRobot
+end
+
+class MockMessage
+  def reply(msg)
+    msg
+  end
+end
