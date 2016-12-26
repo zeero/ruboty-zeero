@@ -16,5 +16,14 @@ describe Ruboty::Zeero do
       assert_equal hello.hello(@message), "Hello world!"
     end
   end
+
+  describe "Echo" do
+    it "メッセージをそのまま返す" do
+      echo = Ruboty::Handlers::Echo.new(@robot)
+      MockMessage.stub_any_instance("[]", "test") do
+        assert_equal echo.echo(@message), "test"
+      end
+    end
+  end
 end
 
