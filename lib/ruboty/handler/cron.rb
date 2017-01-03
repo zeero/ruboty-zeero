@@ -10,8 +10,6 @@ require 'qiita'
 module Ruboty
   module Handlers
     class CronP2Q < Base
-      include Ruboty::Zeero
-
       on(
         /p2q ([0-9]+)/,
         name: "p2q",
@@ -78,15 +76,15 @@ module Ruboty
           case res
           when Net::HTTPSuccess
             json = JSON.parse(res.body)
-            @@logger.info "Pocket API: json=#{json}" if $DEBUG
+            Ruboty::Zeero.logger.info "Pocket API: json=#{json}" if $DEBUG
             return json
           when Net::HTTPRedirection
-            @@logger.warn "HTTP Redicect: code=#{res.code} message=#{res.message}"
+            Ruboty::Zeero.logger.warn "HTTP Redicect: code=#{res.code} message=#{res.message}"
           else
-            @@logger.error "HTTP Error: code=#{res.code} message=#{res.message}"
+            Ruboty::Zeero.logger.error "HTTP Error: code=#{res.code} message=#{res.message}"
           end
         rescue => e
-          @@logger.error e.message
+          Ruboty::Zeero.logger.error e.message
         end
       end
 
@@ -106,7 +104,7 @@ module Ruboty
         client = Qiita::Client.new(access_token: ENV["RUBOTY_QIITA_TOKEN"])
         qids.each do |qid, qtitle|
           result = client.stock_item qid
-          @@logger.info "Qiita API: status=#{result.status} body=#{result.body}" if $DEBUG
+          Ruboty::Zeero.logger.info "Qiita API: status=#{result.status} body=#{result.body}" if $DEBUG
         end
         msg = "【P2Q】"
         case qids.count
