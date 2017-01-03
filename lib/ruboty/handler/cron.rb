@@ -10,7 +10,13 @@ require 'qiita'
 module Ruboty
   module Handlers
     class CronP2Q < Base
-      @logger = Logger.new($stdout)
+      @@logger = Logger.new($stdout)
+
+      on(
+        /p2q ([0-9]+)/,
+        name: "p2q",
+        description: "Pocketに登録したQiitaの記事をストックする"
+      )
 
       def initialize(robot)
         super
@@ -29,14 +35,15 @@ module Ruboty
         }
       end
 
-      def p2q
-        json = fetch_pocket
+      def p2q(msg = nil)
+        since = msg ? Date.strptime(msg[1], "%Y%m%d") : Date.today - 1
+        json = fetch_pocket(since.to_time.to_i)
         qids = filter_qiita(json)
         msg = stock_qiita(qids)
         return msg
       end
 
-      def fetch_pocket
+      def fetch_pocket(since)
         # header
         headers = {
           "Content-type" => "application/x-www-form-urlencoded; charset=utf8",
@@ -46,7 +53,7 @@ module Ruboty
         body = URI.encode_www_form({
           consumer_key: ENV["RUBOTY_POCKET_CONSUMER_KEY"],
           access_token: ENV["RUBOTY_POCKET_TOKEN"],
-          since: (Date.today - 1).to_time.to_i,
+          since: String(since),
           search: 'qiita.com',
           sort: 'oldest',
           count: "1",
@@ -70,14 +77,16 @@ module Ruboty
           # 結果取得
           case res
           when Net::HTTPSuccess
-            return JSON.parse(res.body)
+            json = JSON.parse(res.body)
+            @@logger.info "Pocket API: json=#{json}" if $DEBUG
+            return json
           when Net::HTTPRedirection
-            logger.warn "HTTP Redicect: code=#{res.code} message=#{res.message}"
+            @@logger.warn "HTTP Redicect: code=#{res.code} message=#{res.message}"
           else
-            logger.error "HTTP Error: code=#{res.code} message=#{res.message}"
+            @@logger.error "HTTP Error: code=#{res.code} message=#{res.message}"
           end
         rescue => e
-          logger.error e.message
+          @@logger.error e.message
         end
       end
 
@@ -87,7 +96,7 @@ module Ruboty
           given_url = pitem["given_url"]
           qid = given_url ? given_url.match(/\/\/qiita\.com\/.+\/items\/(.+)$/) : nil
           if qid
-            map[qid[1]] = pitem["given_title"]
+            map[qid[1]] = pitem["resolved_title"]
           end
         end
         return map
@@ -97,7 +106,7 @@ module Ruboty
         client = Qiita::Client.new(access_token: ENV["RUBOTY_QIITA_TOKEN"])
         qids.each do |qid, qtitle|
           result = client.stock_item qid
-          logger.info "Qiita API: status=#{result.status} body=#{result.body}" if $DEBUG
+          @@logger.info "Qiita API: status=#{result.status} body=#{result.body}" if $DEBUG
         end
         msg = "【P2Q】"
         case qids.count
