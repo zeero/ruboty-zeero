@@ -10,7 +10,7 @@ require 'qiita'
 module Ruboty
   module Handlers
     class CronP2Q < Base
-      @@logger = Logger.new($stdout)
+      include Ruboty::Zeero
 
       on(
         /p2q ([0-9]+)/,

@@ -2,6 +2,7 @@ require "ruboty/zeero/version"
 
 module Ruboty
   module Zeero
+    @@logger = Logger.new($stdout)
   end
 end
 
