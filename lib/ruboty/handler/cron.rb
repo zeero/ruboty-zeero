@@ -11,9 +11,9 @@ module Ruboty
   module Handlers
     class CronP2Q < Base
       on(
-        /p2q ([0-9]+)/,
+        /p2q (?<yyyymmdd>[0-9]+)/i,
         name: "p2q",
-        description: "Pocketに登録したQiitaの記事をストックする（パラメータはYYYYMMDD形式）"
+        description: "Pocketに登録したQiitaの記事をストックする。"
       )
 
       def initialize(robot)
@@ -34,7 +34,7 @@ module Ruboty
       end
 
       def p2q(msg = nil)
-        since = msg ? Date.strptime(msg[1], "%Y%m%d") : Date.today - 1
+        since = msg ? Date.strptime(msg[:yyyymmdd], "%Y%m%d") : Date.today - 1
         json = fetch_pocket(since.to_time.to_i)
         qids = filter_qiita(json)
         reply = stock_qiita(qids)
@@ -123,9 +123,9 @@ module Ruboty
 
     class CronF2P < Base
       on(
-        /f2p ([0-9]+)/,
+        /f2p (?<yyyymmdd>[0-9]+)/i,
         name: "f2p",
-        description: "FourSquareに登録したurlをPocketに登録する（パラメータはYYYYMMDD形式）"
+        description: "FourSquareに登録したurlをPocketに登録する。"
       )
 
       def initialize(robot)
@@ -146,7 +146,7 @@ module Ruboty
       end
 
       def f2p(msg = nil)
-        since = msg ? Date.strptime(msg[1], "%Y%m%d") : Date.today - 1
+        since = msg ? Date.strptime(msg[:yyyymmdd], "%Y%m%d") : Date.today - 1
         json = fetch_4sq
         urls = filter_recent(json, since.to_time.to_i)
         reply = post_pocket(urls)

@@ -16,13 +16,13 @@ module Ruboty
 
     class Echo < Base
       on(
-        /echo (.*)/i,
+        /echo +(?<message>.*)/i,
         name: "echo",
-        description: "Echo your message."
+        description: "メッセージをそのままエコーする。"
       )
 
       def echo(message)
-        message.reply("#{message[1]}")
+        message.reply("#{message[:message]}")
       end
     end
 
@@ -30,20 +30,20 @@ module Ruboty
       @@colors = YAML.load_file(File.expand_path('../../../../resources/colors.yaml', __FILE__))
 
       on(
-        /color ([a-z]+)/,
+        /color +(?<color_name>[a-z]+)/i,
         name: "color",
-        description: "Reply RGB color."
+        description: "指定された色のRGB表現を返す。"
       )
 
       def color(msg)
-        msg.reply("#{msg[1]}は #{@@colors[msg[1]]} です")
+        msg.reply("#{msg[1]}は #{@@colors[msg[:color_name]]} です")
       end
 
 
       on(
-        /colors$/,
+        /colors$/i,
         name: "colors",
-        description: "Reply all RGB colors."
+        description: "定義されているすべての色のRGB表現を返す。"
       )
 
       def colors(msg)
