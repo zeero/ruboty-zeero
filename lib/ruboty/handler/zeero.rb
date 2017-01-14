@@ -78,9 +78,9 @@ module Ruboty
         han = msg[:han] || "1"
         point = @@table[fu] ? @@table[fu][han.to_i - 1] : nil
         if point
-          msg.reply("#{fu}符#{han}翻の点数は、#{point}です。")
+          msg.reply("#{fu}符#{han}翻の点数は、#{point}です")
         else
-          msg.reply("#{fu}符#{han}翻の点数は、わかりません。")
+          msg.reply("#{fu}符#{han}翻の点数は、わかりません")
         end
       end
     end
@@ -96,8 +96,9 @@ module Ruboty
         expr = msg[:expr].gsub(/\^/, "**")
         begin
           result = eval(expr)
-        rescue => e
-          msg.reply("#{expr}の計算はできません")
+        rescue Exception => exc
+          msg.reply("#{expr} の計算はできません")
+          return
         end
         msg.reply(result)
       end
