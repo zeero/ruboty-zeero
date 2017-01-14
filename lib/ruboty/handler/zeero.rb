@@ -85,5 +85,23 @@ module Ruboty
       end
     end
 
+    class Calc < Base
+      on(
+        /calc +(?<expr>[0-9 \+\-\*\/\%\^\(\)]+)/i,
+        name: "calc",
+        description: "四則演算をします。使える演算子は+-*/%^です。"
+      )
+
+      def calc(msg)
+        expr = msg[:expr].gsub(/\^/, "**")
+        begin
+          result = eval(expr)
+        rescue => e
+          msg.reply("#{expr}の計算はできません")
+        end
+        msg.reply(result)
+      end
+    end
+
   end
 end
