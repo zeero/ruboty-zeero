@@ -1,5 +1,3 @@
-require "ruboty/zeero/version"
-
 module Ruboty
   module Zeero
     @logger = Logger.new($stdout)
@@ -10,5 +8,7 @@ module Ruboty
   end
 end
 
-require 'ruboty/handler/zeero'
 require 'ruboty/handler/cron'
+require 'ruboty/handler/zeero'
+require "ruboty/zeero/version"
+
