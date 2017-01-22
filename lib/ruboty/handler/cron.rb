@@ -117,7 +117,6 @@ module Ruboty
         end
         return msg
       end
-
     end
 
 
@@ -272,8 +271,89 @@ module Ruboty
         end
         return msg
       end
-
     end
+
+
+    class FeedFilter < Base
+      on(
+        /feedfilter$/i,
+        name: "feed_filter",
+        description: "登録したfeedの新着情報をチェックする。"
+      )
+
+      def initialize(robot)
+        super
+        @thread = Thread.new {
+          schedule = ! $DEBUG ? "0 * * * *" : "* * * * *"
+          Chrono::Trigger.new(schedule) {
+            msg = Message.new(robot: robot)
+            attributes = {
+              to: "general@conference.zeero.xmpp.slack.com/zeero",
+              type: "groupchat",
+              body: feed_filter,
+              original: msg.original
+            }
+            robot.say(attributes)
+          }.run
+        }
+      end
+
+      def feed_filter(msg = nil)
+        data = robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY] || {}
+        replies = []
+        data.each do |feed|
+          items = get_new_items(feed)
+          if ! items.empty?
+            replies << "【Feed】#{feed.title}"
+            replies.concat(items.map { |item| "#{item.link}"})
+          end
+        end
+        reply = replies.join("\n")
+        return Ruboty::Message === msg ? msg.reply(reply) : reply
+      end
+
+      private
+
+      def get_new_items(feed)
+        rss = RSS::Parser.parse(feed[:url])
+        keyword = feed[:keyword]
+        keyword_type = feed[:keyword_type]
+
+        results = []
+        rss.items.each do |item|
+          dc_date = item.dc_date rescue Error
+          dc_date ||= item.pubDate rescue Error
+          break if ! dc_date
+
+          if dc_date > feed[:check_date]
+            results << item if ! keyword || has_keyword?(item, keyword, keyword_type)
+          else
+            break
+          end
+        end
+
+        return results
+      end
+
+      def has_keyword?(item, keyword, keyword_type)
+        target = ""
+        case keyword_type
+        when "0"
+          target = "#{item.title}\n#{item.description}"
+        when "1"
+          target = item.title
+        when "2"
+          target = item.description
+        end
+
+        keyword.split(",").each do |keyword|
+          return true if target.match keyword
+        end
+
+        return false
+      end
+    end
+
 
   end
 end

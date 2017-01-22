@@ -1,3 +1,6 @@
+require 'yaml'
+require 'rss'
+
 module Ruboty
   module Zeero
     @logger = Logger.new($stdout)
