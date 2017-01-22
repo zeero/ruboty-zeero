@@ -322,9 +322,9 @@ module Ruboty
 
         results = []
         rss.items.each do |item|
-          dc_date = item.dc_date rescue Error
-          dc_date ||= item.pubDate rescue Error
-          dc_date ||= item.published.content rescue Error
+          dc_date = item.dc_date rescue nil
+          dc_date ||= item.pubDate rescue nil
+          dc_date ||= item.published.content rescue nil
           break if ! dc_date
 
           if dc_date > feed[:check_date]
