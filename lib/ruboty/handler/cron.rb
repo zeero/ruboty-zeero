@@ -301,12 +301,13 @@ module Ruboty
       def feed_filter(msg = nil)
         data = robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY] || {}
         replies = []
-        data.each do |feed|
+        data.each_with_index do |feed, index|
           items = get_new_items(feed)
           if ! items.empty?
             replies << "【Feed】#{feed.title}"
             replies.concat(items.map { |item| "#{item.link}"})
           end
+          robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY][index][:check_date] = Time.now
         end
         reply = replies.join("\n")
         return Ruboty::Message === msg ? msg.reply(reply) : reply
