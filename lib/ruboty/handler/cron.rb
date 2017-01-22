@@ -316,7 +316,7 @@ module Ruboty
       private
 
       def get_new_items(feed)
-        rss = RSS::Parser.parse(feed[:url])
+        rss = RSS::Parser.parse(feed[:url], false)
         keyword = feed[:keyword]
         keyword_type = feed[:keyword_type]
 
@@ -324,6 +324,7 @@ module Ruboty
         rss.items.each do |item|
           dc_date = item.dc_date rescue Error
           dc_date ||= item.pubDate rescue Error
+          dc_date ||= item.published.content rescue Error
           break if ! dc_date
 
           if dc_date > feed[:check_date]
@@ -337,14 +338,24 @@ module Ruboty
       end
 
       def has_keyword?(item, keyword, keyword_type)
+        title = ""
+        description = ""
+        if item.instance_of? RSS::Atom::Feed
+          title = item.title.content
+          description = item.summary.content
+        else
+          title = item.title
+          description = item.descrition
+        end
+
         target = ""
         case keyword_type
         when "0"
-          target = "#{item.title}\n#{item.description}"
+          target = "#{title}\n#{description}"
         when "1"
-          target = item.title
+          target = title
         when "2"
-          target = item.description
+          target = description
         end
 
         keyword.split(",").each do |keyword|

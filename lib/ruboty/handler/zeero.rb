@@ -144,11 +144,15 @@ module Ruboty
         # check valid feed
         rss = nil
         begin
-          rss = RSS::Parser.parse url
+          rss = RSS::Parser.parse(url, false)
         rescue
         end
         if rss
-          feed.merge!({title: rss.channel.title})
+          if rss.instance_of? RSS::Atom::Feed
+            feed.merge!({title: rss.title.content})
+          else
+            feed.merge!({title: rss.channel.title})
+          end
         else
           return msg.reply "#{url} はRSSではありません"
         end
