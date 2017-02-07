@@ -276,7 +276,7 @@ module Ruboty
 
     class FeedFilter < Base
       on(
-        /feedfilter$/i,
+        /feedfilter(?: +(?<YYYYMMDD>[0-9]{1,8}))?$/i,
         name: "feed_filter",
         description: "登録したfeedの新着情報をチェックする。"
       )
@@ -284,7 +284,7 @@ module Ruboty
       def initialize(robot)
         super
         @thread = Thread.new {
-          schedule = ! $DEBUG ? "0 * * * *" : "* * * * *"
+          schedule = "* * * * *"
           Chrono::Trigger.new(schedule) {
             msg = Message.new(robot: robot)
             attributes = {
@@ -302,7 +302,8 @@ module Ruboty
         data = robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY] || {}
         replies = []
         data.each_with_index do |feed, index|
-          items = get_new_items(feed)
+          check_date = msg && msg[:YYYYMMDD] ? Date.strptime(msg[:YYYYMMDD], "%Y%m%d") : feed[:check_date]
+          items = get_new_items(feed, check_date)
           if ! items.empty?
             replies << "【Feed】#{feed.title}"
             replies.concat(items.map { |item| "#{item.link}"})
@@ -315,7 +316,8 @@ module Ruboty
 
       private
 
-      def get_new_items(feed)
+      def get_new_items(feed, check_date)
+        # p feed[:url]
         rss = RSS::Parser.parse(feed[:url], false)
         keyword = feed[:keyword]
         keyword_type = feed[:keyword_type]
@@ -325,12 +327,13 @@ module Ruboty
           dc_date = item.dc_date rescue nil
           dc_date ||= item.pubDate rescue nil
           dc_date ||= item.published.content rescue nil
-          break if ! dc_date
+          next if ! dc_date
+          # p dc_date
 
-          if dc_date > feed[:check_date]
+          if dc_date > check_date
             results << item if ! keyword || has_keyword?(item, keyword, keyword_type)
           else
-            break
+            next
           end
         end
 
