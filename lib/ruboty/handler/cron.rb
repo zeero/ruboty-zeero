@@ -305,7 +305,7 @@ module Ruboty
           check_date = msg && msg[:YYYYMMDD] ? Date.strptime(msg[:YYYYMMDD], "%Y%m%d") : feed[:check_date]
           items = get_new_items(feed, check_date)
           if ! items.empty?
-            replies << "【Feed】#{feed.title}"
+            replies << "【Feed】#{feed[:title]}"
             replies.concat(items.map { |item| "#{item.link}"})
           end
           robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY][index][:check_date] = Time.now
