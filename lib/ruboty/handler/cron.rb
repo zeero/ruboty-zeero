@@ -277,44 +277,51 @@ module Ruboty
     class FeedFilter < Base
       on(
         /feedfilter(?: +(?<YYYYMMDD>[0-9]{1,8}))?$/i,
-        name: "feed_filter",
+        name: "feedfilter",
         description: "登録したfeedの新着情報をチェックする。"
       )
 
       def initialize(robot)
         super
         @thread = Thread.new {
-          schedule = "* * * * *"
+          schedule = "0 * * * *"
           Chrono::Trigger.new(schedule) {
-            msg = Message.new(robot: robot)
-            attributes = {
-              to: "general@conference.zeero.xmpp.slack.com/zeero",
-              type: "groupchat",
-              body: feed_filter,
-              original: msg.original
-            }
-            robot.say(attributes)
+            data = robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY] || {}
+            data.each_with_index do |feed, index|
+              msg = Message.new(robot: robot)
+              attributes = {
+                to: "general@conference.zeero.xmpp.slack.com/zeero",
+                type: "groupchat",
+                body: feed_filter(feed, feed[:check_date]),
+                original: msg.original
+              }
+              robot.say(attributes)
+              robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY][index][:check_date] = Time.now
+            end
           }.run
         }
       end
 
-      def feed_filter(msg = nil)
+      def feedfilter(msg)
+        check_date = msg[:YYYYMMDD] ? Date.strptime(msg[:YYYYMMDD], "%Y%m%d") : feed[:check_date]
         data = robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY] || {}
-        replies = []
         data.each_with_index do |feed, index|
-          check_date = msg && msg[:YYYYMMDD] ? Date.strptime(msg[:YYYYMMDD], "%Y%m%d") : feed[:check_date]
-          items = get_new_items(feed, check_date)
-          if ! items.empty?
-            replies << "【Feed】#{feed[:title]}"
-            replies.concat(items.map { |item| "#{item.link}"})
-          end
+          msg.reply(feed_filter(feed, check_date))
           robot.brain.data[Ruboty::Handlers::Feed::BRAIN_KEY][index][:check_date] = Time.now
         end
-        reply = replies.join("\n")
-        return Ruboty::Message === msg ? msg.reply(reply) : reply
       end
 
       private
+
+      def feed_filter(feed, check_date)
+        replies = []
+        items = get_new_items(feed, check_date)
+        if ! items.empty?
+          replies << "【Feed】#{feed[:title]}"
+          replies.concat(items.map { |item| "#{item.link}"})
+        end
+        return replies.join("\n")
+      end
 
       def get_new_items(feed, check_date)
         # p feed[:url]
