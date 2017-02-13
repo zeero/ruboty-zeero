@@ -348,7 +348,7 @@ module Ruboty
           description = item.summary.content
         else
           title = item.title
-          description = item.descrition
+          description = item.description
         end
 
         target = ""
