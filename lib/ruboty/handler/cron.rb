@@ -343,7 +343,7 @@ module Ruboty
       def has_keyword?(item, keyword, keyword_type)
         title = ""
         description = ""
-        if item.instance_of? RSS::Atom::Feed
+        if item.instance_of? RSS::Atom::Feed::Entry
           title = item.title.content
           description = item.summary.content
         else
