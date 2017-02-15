@@ -44,7 +44,7 @@ module Ruboty
         items = get_new_items(feed, check_date)
         if ! items.empty?
           replies << "【Feed】#{feed[:title]}"
-          replies.concat(items.map { |item| "#{item.link}"})
+          replies.concat(items.map { |item| item.instance_of? RSS::Atom::Feed::Entry ? item.link.href : item.link})
         end
         return replies.join("\n")
       end
