@@ -1,5 +1,5 @@
-FROM ruby:2.3.1
-RUN gem install bundler -v 1.16.1
+FROM ruby:2.6.2
+RUN gem install bundler -v 1.17.2
 
 WORKDIR /usr/src/app
 # COPY Gemfile Gemfile.lock vendor/ruboty-zeero .git ./
