@@ -9,6 +9,7 @@ COPY . ./
 # ENV BUNDLE_FROZEN=true
 RUN bundle config set path 'vendor/bundle'
 RUN bundle config set deployment 'true'
+RUN bundle config set without 'development:test'
 RUN bundle install
 
 # COPY . ./
