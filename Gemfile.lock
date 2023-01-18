@@ -42,7 +42,7 @@ GEM
       rainbow
       rouge
       slop
-    rack (2.2.2)
+    rack (3.0.4.1)
     rainbow (3.0.0)
     rake (13.0.1)
     redis (4.1.3)
